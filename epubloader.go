@@ -23,6 +23,30 @@ type RootFile struct {
 	FullPath string `xml:"full-path,attr"`
 }
 
+type XMLPackage struct {
+	XMLName xml.Name `xml:"package"`
+	CurrentMetadata MetaData `xml:"metadata"`
+	CurrentManifest Manifest `xml:"mainfest"`
+}
+
+type MetaData struct{
+	XMLName xml.Name `xml:"metadata"`
+	// what information do we want from the meta data
+}
+
+type Manifest struct{
+	XMLName	xml.Name `xml:"manifest"`
+	// ask george about if this is the correct way to make a slice
+	Chapters []Item `xml:"item"`
+}
+
+type Item struct{
+	XMLName xml.Name `xml: "item"`
+	Href string `xml:"href,attr"`
+	Id string `xml:"id,attr"`
+	MediaType string `xml:"media-type,attr"`
+}
+
 func Load() {
 
 }
@@ -44,4 +68,27 @@ func getContentPath(path string) (string, error) {
 	xml.Unmarshal(text, &container)
 
 	return container.Files.CurrentFile.FullPath, nil
+}
+
+func getDataFromPath(path string) (XMLPackage,error){
+	// sends in the path from getContentPath
+	xmlFile, err := os.Open(path)
+	if err != nil{
+		log.Fatal(err)
+		return "",err
+	}
+	defer xmlFile.Close()
+
+	text, _ := ioutil.ReadAll(xmlFile)
+	var xmlPackage XMLPackage
+	xml.Unmarshal(text, &xmlPackage)
+
+	return xmlPackage,nil
+
+}
+
+//Is this returning the list of data? 
+func getChapters(contentData XMLPackage) ([]Item,error){
+
+	return xmlPackage.Manifest.Item, nil
 }
